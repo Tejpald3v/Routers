@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// HandleRequest ...
 func HandleRequest() {
 	// fmt.Println("Server")
 	http.HandleFunc("/", Home)

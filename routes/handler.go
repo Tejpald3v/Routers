@@ -46,12 +46,12 @@ func checkID(rw http.ResponseWriter, r *http.Request) bool {
 
 	if _, ok := mp[id]; ok {
 		return true
-	} else {
-		fmt.Fprintln(rw, "Not present in map")
 	}
+	fmt.Fprintln(rw, "Not present in map")
 	return false
 }
 
+// Home ...
 func Home(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		return
@@ -59,6 +59,7 @@ func Home(rw http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(rw, "Welcome to the home page route")
 }
 
+// Get ...
 func Get(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		return
@@ -66,6 +67,7 @@ func Get(rw http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(rw, "You have reached to get route")
 }
 
+// Post ...
 func Post(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		return
@@ -79,11 +81,11 @@ func Post(rw http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(rw, "Sccussfully created the user", id)
 }
 
+// Put ...
 func Put(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
 		return
 	}
-
 	if checkID(rw, r) {
 		u := decodeJSON(rw, r)
 		id, _ := uuid.FromString(path.Base(r.URL.Path))
@@ -93,6 +95,7 @@ func Put(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Delete ...
 func Delete(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
 		return
