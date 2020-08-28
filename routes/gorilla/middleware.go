@@ -1,4 +1,4 @@
-package routes
+package gorilla
 
 import (
 	"net/http"
