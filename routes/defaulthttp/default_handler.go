@@ -12,6 +12,14 @@ import (
 
 var mp = make(map[uuid.UUID]User)
 
+// Response data format for HTTP
+type Response struct {
+	Status  string      `json:"status" bson:"status"`                       // Status code (error|fail|success)
+	Code    int         `json:"code"  bson:"code"`                          // HTTP status code
+	Message string      `json:"message,omitempty" bson:"message,omitempty"` // Error or status message
+	Data    interface{} `json:"data,omitempty" bson:"data,omitempty"`       // Data payload
+}
+
 // User is ...
 type User struct {
 	Name       string  `json:"name"`
@@ -71,7 +79,7 @@ func Post(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u := decodeJSON(rw, r)
-	id := uuid.Must(uuid.NewV4())
+	id := uuid.NewV4()
 
 	// Storing the user in the map with id as the key
 	mp[id] = u

@@ -22,6 +22,6 @@ func HandleRequest(r *mux.Router) {
 
 	deleteRouter := r.Methods("DELETE").Subrouter()
 	deleteRouter.HandleFunc("/delete/{id}", Delete)
-	putRouter.Use(checkID)
+	deleteRouter.Use(checkID)
 
 }
