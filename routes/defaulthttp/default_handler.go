@@ -12,6 +12,14 @@ import (
 
 var mp = make(map[uuid.UUID]User)
 
+// Response data format for HTTP
+type Response struct {
+	Status  string      `json:"status" bson:"status"`                       // Status code (error|fail|success)
+	Code    int         `json:"code"  bson:"code"`                          // HTTP status code
+	Message string      `json:"message,omitempty" bson:"message,omitempty"` // Error or status message
+	Data    interface{} `json:"data,omitempty" bson:"data,omitempty"`       // Data payload
+}
+
 // User is ...
 type User struct {
 	Name       string  `json:"name"`
@@ -49,9 +57,19 @@ func checkID(rw http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
+type res struct {
+	message string `json:"message"`
+}
+
+func incorrect(rw http.ResponseWriter) {
+	rw.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(rw).Encode(res{"Incorrect http verb used"})
+}
+
 // Home ...
 func Home(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
+		incorrect(rw)
 		return
 	}
 	fmt.Fprintln(rw, "Welcome to the home page route")
@@ -60,6 +78,7 @@ func Home(rw http.ResponseWriter, r *http.Request) {
 // Get ...
 func Get(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
+		incorrect(rw)
 		return
 	}
 	fmt.Fprintln(rw, "You have reached to get route")
@@ -68,10 +87,11 @@ func Get(rw http.ResponseWriter, r *http.Request) {
 // Post ...
 func Post(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		incorrect(rw)
 		return
 	}
 	u := decodeJSON(rw, r)
-	id := uuid.Must(uuid.NewV4())
+	id := uuid.NewV4()
 
 	// Storing the user in the map with id as the key
 	mp[id] = u
@@ -82,6 +102,7 @@ func Post(rw http.ResponseWriter, r *http.Request) {
 // Put ...
 func Put(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
+		incorrect(rw)
 		return
 	}
 
@@ -97,6 +118,7 @@ func Put(rw http.ResponseWriter, r *http.Request) {
 // Delete ...
 func Delete(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
+		incorrect(rw)
 		return
 	}
 

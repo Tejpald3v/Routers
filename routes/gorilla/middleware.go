@@ -11,7 +11,7 @@ func checkID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		_, err := uuid.FromString(mux.Vars(r)["id"])
 		if err != nil {
-			http.Error(rw, err.Error(), 400)
+			sendResponse(rw, "Bad Request", 400, err.Error(), nil)
 			return
 		}
 
