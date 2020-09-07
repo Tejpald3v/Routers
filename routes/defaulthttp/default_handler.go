@@ -57,9 +57,19 @@ func checkID(rw http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
+type res struct {
+	message string `json:"message"`
+}
+
+func incorrect(rw http.ResponseWriter) {
+	rw.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(rw).Encode(res{"Incorrect http verb used"})
+}
+
 // Home ...
 func Home(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
+		incorrect(rw)
 		return
 	}
 	fmt.Fprintln(rw, "Welcome to the home page route")
@@ -68,6 +78,7 @@ func Home(rw http.ResponseWriter, r *http.Request) {
 // Get ...
 func Get(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
+		incorrect(rw)
 		return
 	}
 	fmt.Fprintln(rw, "You have reached to get route")
@@ -76,6 +87,7 @@ func Get(rw http.ResponseWriter, r *http.Request) {
 // Post ...
 func Post(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		incorrect(rw)
 		return
 	}
 	u := decodeJSON(rw, r)
@@ -90,6 +102,7 @@ func Post(rw http.ResponseWriter, r *http.Request) {
 // Put ...
 func Put(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
+		incorrect(rw)
 		return
 	}
 
@@ -105,6 +118,7 @@ func Put(rw http.ResponseWriter, r *http.Request) {
 // Delete ...
 func Delete(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
+		incorrect(rw)
 		return
 	}
 
