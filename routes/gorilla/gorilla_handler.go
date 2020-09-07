@@ -2,7 +2,6 @@ package gorilla
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -24,8 +23,9 @@ func decodeJSON(rw http.ResponseWriter, r *http.Request) User {
 	var u User
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		log.Fatal(err)
+		sendResponse(rw, "Bad Request", 400, err.Error(), nil)
+		// TODO: DO not stop the server.
+		log.Fatal()
 	}
 	return u
 }
@@ -37,23 +37,24 @@ func writeResponse(rw http.ResponseWriter, s User) {
 
 // Home ...
 func Home(rw http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(rw, "Welcome to the home route")
+	sendResponse(rw, "Success", 200, "Welcome to the home route", nil)
+	// fmt.Fprintln(rw, "")
 }
 
 // Get ...
 func Get(rw http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(rw, "You have reached to get route")
+	sendResponse(rw, "Success", 200, "You have reached to get route", nil)
 }
 
 // Post ...
 func Post(rw http.ResponseWriter, r *http.Request) {
 	u := decodeJSON(rw, r)
-	id := uuid.Must(uuid.NewV4())
+	id := uuid.NewV4()
 
 	// Storing the user in the map with id as the key
 	mp[id] = u
-	writeResponse(rw, u)
-	fmt.Fprintln(rw, "Sccussfully created the user", id)
+	// TODO:	Merge id and the user struct. Create struct that include id and user data or convert the id to string type and send speratly indicating the id.
+	sendResponse(rw, "Success", 201, "Sccussfully created the user", id)
 }
 
 // Put ...
@@ -64,20 +65,19 @@ func Put(rw http.ResponseWriter, r *http.Request) {
 	id, _ := uuid.FromString(vars["id"])
 	if _, ok := mp[id]; ok {
 		mp[id] = u
-		fmt.Fprintln(rw, "Updated User!")
-		writeResponse(rw, u)
+		sendResponse(rw, "Success", 200, "Updated user successfully!", u)
 		return
 	}
-	fmt.Fprintln(rw, "ID not present in map")
+	sendResponse(rw, "Bad Request", 400, "ID not present in map!", nil)
 }
 
 // Delete ...
 func Delete(rw http.ResponseWriter, r *http.Request) {
 	id, _ := uuid.FromString(mux.Vars(r)["id"])
 	if _, ok := mp[id]; !ok {
-		fmt.Fprintln(rw, "ID not present in map")
+		sendResponse(rw, "Bad Request", 400, "ID not present in map!", nil)
 		return
 	}
 	delete(mp, id)
-	fmt.Fprintln(rw, "Successfully deleted!")
+	sendResponse(rw, "Success", 200, "Successfully deleted!", nil)
 }
