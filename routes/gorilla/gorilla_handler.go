@@ -1,4 +1,4 @@
-package routes
+package gorilla
 
 import (
 	"encoding/json"
@@ -11,8 +11,6 @@ import (
 )
 
 var mp = make(map[uuid.UUID]User)
-
-// For json package to access the properties it needs to be capital which then can be exported and used by the json package
 
 // User is ...
 type User struct {
@@ -36,20 +34,6 @@ func writeResponse(rw http.ResponseWriter, s User) {
 	rw.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(rw).Encode(s)
 }
-
-// func checkID(rw http.ResponseWriter, r *http.Request) bool {
-// 	id, err := uuid.FromString(mux.Vars(r)["id"])
-// 	if err != nil {
-// 		http.Error(rw, err.Error(), 400)
-// 		return false
-// 	}
-
-// 	if _, ok := mp[id]; ok {
-// 		return true
-// 	}
-// 	fmt.Fprintln(rw, "Not present in map")
-// 	return false
-// }
 
 // Home ...
 func Home(rw http.ResponseWriter, r *http.Request) {

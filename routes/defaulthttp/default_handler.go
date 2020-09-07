@@ -1,18 +1,16 @@
-package routes
+package defaulthttp
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"path"
 
-	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 )
 
 var mp = make(map[uuid.UUID]User)
-
-// For json package to access the properties it needs to be capital which then can be exported and used by the json package
 
 // User is ...
 type User struct {
@@ -37,32 +35,41 @@ func writeResponse(rw http.ResponseWriter, s User) {
 	json.NewEncoder(rw).Encode(s)
 }
 
-// func checkID(rw http.ResponseWriter, r *http.Request) bool {
-// 	id, err := uuid.FromString(mux.Vars(r)["id"])
-// 	if err != nil {
-// 		http.Error(rw, err.Error(), 400)
-// 		return false
-// 	}
+func checkID(rw http.ResponseWriter, r *http.Request) bool {
+	id, err := uuid.FromString(path.Base(r.URL.Path))
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return false
+	}
 
-// 	if _, ok := mp[id]; ok {
-// 		return true
-// 	}
-// 	fmt.Fprintln(rw, "Not present in map")
-// 	return false
-// }
+	if _, ok := mp[id]; ok {
+		return true
+	}
+	fmt.Fprintln(rw, "Not present in map")
+	return false
+}
 
 // Home ...
 func Home(rw http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(rw, "Welcome to the home route")
+	if r.Method != http.MethodGet {
+		return
+	}
+	fmt.Fprintln(rw, "Welcome to the home page route")
 }
 
 // Get ...
 func Get(rw http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		return
+	}
 	fmt.Fprintln(rw, "You have reached to get route")
 }
 
 // Post ...
 func Post(rw http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		return
+	}
 	u := decodeJSON(rw, r)
 	id := uuid.Must(uuid.NewV4())
 
@@ -74,26 +81,28 @@ func Post(rw http.ResponseWriter, r *http.Request) {
 
 // Put ...
 func Put(rw http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+	if r.Method != http.MethodPut {
+		return
+	}
 
-	u := decodeJSON(rw, r)
-	id, _ := uuid.FromString(vars["id"])
-	if _, ok := mp[id]; ok {
+	if checkID(rw, r) {
+		u := decodeJSON(rw, r)
+		id, _ := uuid.FromString(path.Base(r.URL.Path))
 		mp[id] = u
 		fmt.Fprintln(rw, "Updated User!")
 		writeResponse(rw, u)
-		return
 	}
-	fmt.Fprintln(rw, "ID not present in map")
 }
 
 // Delete ...
 func Delete(rw http.ResponseWriter, r *http.Request) {
-	id, _ := uuid.FromString(mux.Vars(r)["id"])
-	if _, ok := mp[id]; !ok {
-		fmt.Fprintln(rw, "ID not present in map")
+	if r.Method != http.MethodDelete {
 		return
 	}
-	delete(mp, id)
-	fmt.Fprintln(rw, "Successfully deleted!")
+
+	if checkID(rw, r) {
+		id, _ := uuid.FromString(path.Base(r.URL.Path))
+		delete(mp, id)
+		fmt.Fprintln(rw, "Successfully deleted!")
+	}
 }

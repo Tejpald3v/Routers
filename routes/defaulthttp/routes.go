@@ -1,9 +1,10 @@
-package routes
+package defaulthttp
 
 import (
 	"net/http"
 )
 
+// HandleRequest ...
 func HandleRequest() {
 	// fmt.Println("Server")
 	http.HandleFunc("/", Home)
@@ -11,6 +12,4 @@ func HandleRequest() {
 	http.HandleFunc("/post", Post)
 	http.HandleFunc("/put/", Put)
 	http.HandleFunc("/delete/", Delete)
-
-	http.ListenAndServe(":8080", nil)
 }
